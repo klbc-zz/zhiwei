@@ -1,0 +1,5 @@
+/target/**
+/.idea/**
+
+/Feeding-uniapp/unpackage/**
+#/Feeding-uniapp/uni_modules/**
