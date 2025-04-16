@@ -17,7 +17,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class CashService {
-    private final Map<String, List<Cash>> cashMap = new ConcurrentHashMap<>();
+
+    private final Map<String, List<Cash>> cashSendMap = new ConcurrentHashMap<>();
+
     public int addCash(Cash cash,UserDTO user) throws Exception {
         String dbfPath = cash.getDbfPath();
         // 定义SQL插入语句（全大写）
@@ -70,6 +72,12 @@ public class CashService {
                 "[SDAY3] = ?, [STAT3] = ?, [SMONE3] = ?, [SNAME4] = ?, " +
                 "[SDAY4] = ?, [STAT4] = ?, [SMONE4] = ? " +
                 "WHERE [NO] = ?";
+        if(cash.getCname()!=null && !cash.getCname().isEmpty()) cashSendMap.remove(cash.getCname());
+        if(cash.getSname1()!=null && !cash.getSname1().isEmpty()) cashSendMap.remove(cash.getSname1());
+        if(cash.getSname2()!=null && !cash.getSname2().isEmpty()) cashSendMap.remove(cash.getSname2());
+        if(cash.getSname3()!=null && !cash.getSname3().isEmpty()) cashSendMap.remove(cash.getSname3());
+        if(cash.getSname4()!=null && !cash.getSname4().isEmpty()) cashSendMap.remove(cash.getSname4());
+
         return DBFSqlUtils.executeInsertSql(dbfPath, updateSql, updateParams);
     }
 
@@ -251,6 +259,9 @@ public class CashService {
 
 
     public List<Cash> send(UserDTO user) {
+        if(cashSendMap.containsKey(user.getCname())){
+            return cashSendMap.get(user.getCname());
+        }
         List<Object> params = new ArrayList<>();
         String querySql = "SELECT * FROM CASH WHERE (" +
                 " (SNAME1 = ? AND STAT1 <= 1) " +
@@ -265,7 +276,6 @@ public class CashService {
         params.add(user.getCname());
         params.add(user.getCname());
 
-
         List<Map<String, Object>> oblist = DBFSqlUtils.executeQuerySqlListResult(user.getDbfPath(), querySql, params);
         List<Cash> cashList = new ArrayList<>();
         for (Map<String, Object> map : oblist) {
@@ -273,6 +283,7 @@ public class CashService {
             beanMapper(map,cash);
             cashList.add(cash);
         }
+        cashSendMap.put(user.getCname(),cashList);
         // 内存分页
 //        PageVO pageVO = cashDTO.getPage();
 //
