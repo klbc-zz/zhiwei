@@ -91,6 +91,7 @@ public class CashController {
     @GetMapping("/send")
     public Result send(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
+        log.info("send token:{}",token);
         if(!checkLogin(token)){
             return Result.error("请先登录");
         }
@@ -103,6 +104,7 @@ public class CashController {
     @GetMapping("/get")
     public Result get(@RequestParam("no") String no,HttpServletRequest request) {
         String token = request.getHeader("Authorization");
+        log.info("get token:{}", token);
         if(!checkLogin(token)){
             return Result.error("请先登录");
         }
