@@ -87,20 +87,23 @@ public class Cash extends Connect {
         insertParams.add(pict8);
         insertParams.add(user.getNextname());
         insertParams.add(sday1);
-        insertParams.add(stat1);
         insertParams.add(smone1);
+        insertParams.add(stat1);
+
         insertParams.add(sname2);
         insertParams.add(sday2);
-        insertParams.add(stat2);
         insertParams.add(smone2);
+        insertParams.add(stat2);
+
         insertParams.add(sname3);
         insertParams.add(sday3);
-        insertParams.add(stat3);
         insertParams.add(smone3);
+        insertParams.add(stat3);
+
         insertParams.add(sname4);
         insertParams.add(sday4);
-        insertParams.add(stat4);
         insertParams.add(smone4);
+        insertParams.add(stat4);
         return insertParams;
     }
     @JsonIgnore

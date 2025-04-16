@@ -17,6 +17,9 @@ import java.util.List;
 @ToString
 public class PageResult<T> {
 	private Integer totalPage;//总页数
+	private Integer total;//总页数
+	private Integer currentPage;//总页数
+	private Integer pageSize;//总页数
 	private List<T> list;//数据
 
 	public PageResult(Integer totalPage, List<T> list) {

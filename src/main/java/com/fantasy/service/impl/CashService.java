@@ -13,9 +13,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class CashService {
+    private final Map<String, List<Cash>> cashMap = new ConcurrentHashMap<>();
     public int addCash(Cash cash,UserDTO user) throws Exception {
         String dbfPath = cash.getDbfPath();
         // 定义SQL插入语句（全大写）
@@ -103,15 +105,30 @@ public class CashService {
         }
         // 内存分页
         PageVO pageVO = cashDTO.getPage();
+        int pageSize = pageVO.getSize();
+        int currentPage = pageVO.getCurrent();
+        int originalListSize = cashList.size(); // 原始数据总量
 
-        int start = (pageVO.getCurrent() - 1) * pageVO.getSize();
-        if (start >= cashList.size()) {
-            cashList = new ArrayList<>();
+// 计算总页数
+        int totalPage = (int) Math.ceil((double) originalListSize / pageSize);
+
+// 分页逻辑
+        int start = (currentPage - 1) * pageSize;
+        List<Cash> pageList;
+        if (start >= originalListSize) {
+            pageList = new ArrayList<>(); // 超出范围返回空列表
+        } else {
+            int end = Math.min(start + pageSize, originalListSize);
+            pageList = cashList.subList(start, end);
         }
-        int end = Math.min(start +  pageVO.getSize(), cashList.size());
-        cashList = cashList.subList(start, end);
+
+// 返回分页结果
         PageResult<Cash> rs = new PageResult<>();
-        rs.setList(cashList);
+        rs.setList(pageList);
+        rs.setTotal(originalListSize);       // 总数据量
+        rs.setTotalPage(totalPage);          // 总页数
+        rs.setCurrentPage(currentPage);      // 当前页码（可选）
+        rs.setPageSize(pageSize);            // 每页大小（可选）
         return rs;
 
 
