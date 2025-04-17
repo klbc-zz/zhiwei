@@ -54,7 +54,8 @@ public class CashService {
                 "?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                 "?, ?, ?)";
         List<Object> insertParams = cash.getObjectList(user);
-
+        if(cash.getCname()!=null && !cash.getCname().isEmpty()) cashSendMap.remove(cash.getCname());
+        if(cash.getSname1()!=null && !cash.getSname1().isEmpty()) cashSendMap.remove(cash.getSname1());
         return DBFSqlUtils.executeInsertSql(dbfPath, sql, insertParams);
     }
     public int updateCash(Cash cash) {
@@ -87,10 +88,10 @@ public class CashService {
                 "(CNAME = ? OR SNAME1 = ? OR SNAME2 = ? OR SNAME3 = ? OR SNAME4 = ?) ";
        if(cashDTO.getStat()!=null){
            querySql = "SELECT * FROM CASH WHERE (" +
-                   "(CNAME = ? AND STAT1 = ?) " +
-                   "OR (CNAME = ? AND STAT2 = ?) " +
-                   "OR (CNAME = ? AND STAT3 = ?) " +
-                   "OR (CNAME = ? AND STAT4 = ?) " +
+                   "(CNAME = ? AND SNAME1 IS NOT NULL AND STAT1 = ?) " +
+                   "OR (CNAME = ? AND SNAME2 IS NOT NULL AND STAT2 = ?) " +
+                   "OR (CNAME = ? AND SNAME3 IS NOT NULL AND STAT3 = ?) " +
+                   "OR (CNAME = ? AND SNAME4 IS NOT NULL  AND STAT4 = ?) " +
                    "OR (SNAME1 = ? AND STAT1 = ?) " +
                    "OR (SNAME2 = ? AND STAT2 = ?) " +
                    "OR (SNAME3 = ? AND STAT3 = ?) " +
