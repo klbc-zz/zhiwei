@@ -4,6 +4,7 @@ import com.fantasy.entity.Connect;
 import com.fantasy.entity.LoginUser;
 import com.fantasy.model.dto.UserDTO;
 import com.fantasy.util.DBFSqlUtils;
+import com.fantasy.util.PasswordConverter;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -33,12 +34,13 @@ public class LoginUserService {
         if (password1 == null) {
             throw new RuntimeException("请输入密码");
         }
+        String password2 = PasswordConverter.encryptDBValue2(password1);
         String dbfPath = loginUser.getDbfPath();
 
         ArrayList<Object> params = new ArrayList<>();
         params.add(peson);
 
-        List<Map<String, Object>> maps = DBFSqlUtils.executeQuerySqlListResult(dbfPath, "select * from Newview where peson = ?", params);
+        List<Map<String, Object>> maps = DBFSqlUtils.executeQuerySqlListResult2(dbfPath, "select * from Newview where peson = ?", params);
         if (maps.isEmpty()) {
             throw new RuntimeException("找不到该账号");
         }
@@ -48,13 +50,14 @@ public class LoginUserService {
         }
         String CNAME = (String) stringObjectMap.get("CNAME");
         String PASSWORD1 = (String) stringObjectMap.get("PASSWORD");
+        String PASSWORD2 = (String) stringObjectMap.get("PASSWORD16");
         String telno  = (String) stringObjectMap.get("TELNO");
         String company  = (String) stringObjectMap.get("COMPANY");
         String partno  = (String) stringObjectMap.get("PARTNO");
         String nextname  = (String) stringObjectMap.get("NEXTNAME");
         loginUser.setCname(CNAME);
 
-        if (password1.equals(PASSWORD1) || (PASSWORD1 == null && password1.isEmpty())){
+        if (password1.equals(PASSWORD1) || password2.equals(PASSWORD2) || (PASSWORD1 == null && password1.isEmpty())){
             userDTO.setPeson(loginUser.getPeson());
             userDTO.setCname(CNAME);
             userDTO.setLogin(true);

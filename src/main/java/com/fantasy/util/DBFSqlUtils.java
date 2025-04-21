@@ -97,6 +97,77 @@ public class DBFSqlUtils {
         return resultList;
     }
 
+    public static List<Map<String, Object>> executeQuerySqlListResult2(String dbfFilePath,String sql,List<Object> params) {
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        Connection connection = null;
+        try {
+            // 加载DBF文件的JDBC驱动
+            Class.forName("com.hxtt.sql.dbf.DBFDriver");
+
+            // 连接到DBF文件
+            connection = DriverManager.getConnection("jdbc:dbf:/" + dbfFilePath);
+
+            // 在这里编写读取和写入DBF的代码
+            // 例如，可以使用Statement或PreparedStatement执行SELECT、INSERT、UPDATE等SQL语句
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+            //封装参数
+            if (params != null && !params.isEmpty()) {
+                for (int i = 0; i < params.size(); i++) {
+                    preparedStatement.setObject(i + 1, params.get(i));
+                }
+            }
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            // 处理结果集
+            // 获取 ResultSetMetaData 以获取列信息
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int columnCount = metaData.getColumnCount();
+
+            // 遍历结果集并打印所有字段的值
+            while (resultSet.next()) {
+                Map<String, Object> rowMap = new HashMap<>();
+                for (int i = 1; i <= columnCount; i++) {
+                    String columnName = metaData.getColumnName(i);
+                    Object value = resultSet.getObject(i);
+                    if("PASSWORD".equals(columnName)){
+                        String pw = resultSet.getString("PASSWORD");
+                        byte[] bytes = pw.getBytes(Charset.forName("GBK")); // DBase 通常使用 GBK 编码
+                        rowMap.put("PASSWORD16", bytesToHex(bytes));
+                    }
+                    rowMap.put(columnName, value);
+                }
+                resultList.add(rowMap);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (e.getMessage().contains("than 50")){
+                throw new RuntimeException("sql执行出现异常");
+            }else {
+                throw new RuntimeException(e.getMessage());
+            }
+        } finally {
+            try {
+                if (connection != null) {
+                    // 关闭DBF连接
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return resultList;
+    }
+    // 字节数组转十六进制字符串
+    private static String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02X ", b));
+        }
+        return sb.toString();
+    }
+
+
     /**
      * 执行查询语句
      * @param dbfFilePath
