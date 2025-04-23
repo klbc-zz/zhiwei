@@ -15,4 +15,12 @@ public class CheckController {
     public String check(){
         return "ok";
     }
+    @GetMapping("/test")
+    public String test() {
+        simulateSqlError();
+        return "This line won't be reached";
+    }
+    public void simulateSqlError() {
+        throw new RuntimeException("sql执行出现异常：Connection refused");
+    }
 }

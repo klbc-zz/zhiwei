@@ -5,6 +5,7 @@ import com.fantasy.entity.LoginUser;
 import com.fantasy.model.dto.UserDTO;
 import com.fantasy.util.DBFSqlUtils;
 import com.fantasy.util.PasswordConverter;
+import com.fantasy.util.TokenUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -79,7 +80,7 @@ public class LoginUserService {
                 String jname = (String) mapsCp0.get("JNAME");
                 userDTO.setJname(jname);
             }
-            String token = UUID.randomUUID().toString();
+            String token = TokenUtils.encrypt(userDTO.getPeson(),loginUser.getDbfPath());
             loginUserMap.put(token,userDTO);
             userDTO.setToken(token);
             return userDTO;
@@ -92,6 +93,63 @@ public class LoginUserService {
         if(token == null){
             return null;
         }
-        return loginUserMap.get(token);
+
+        UserDTO userDTO =  loginUserMap.get(token);
+        if(userDTO == null){
+            String[] ut = TokenUtils.decrypt(token);
+            if(ut==null || ut.length != 2){
+                return null;
+            }
+            userDTO = getUserByToken(ut[0],ut[1]);
+        }
+        return userDTO;
+    }
+    private UserDTO getUserByToken(String peson,String dbfPath) {
+        ArrayList<Object> params = new ArrayList<>();
+        params.add(peson);
+        List<Map<String, Object>> maps = DBFSqlUtils.executeQuerySqlListResult2(dbfPath, "select * from Newview where peson = ?", params);
+        if (maps.isEmpty()) {
+            throw new RuntimeException("找不到该账号");
+        }
+        Map<String, Object> stringObjectMap = maps.get(0);
+        if (stringObjectMap == null) {
+            return null;
+        }
+        UserDTO userDTO = new UserDTO();
+        String CNAME = (String) stringObjectMap.get("CNAME");
+        String PASSWORD1 = (String) stringObjectMap.get("PASSWORD");
+        String PASSWORD2 = (String) stringObjectMap.get("PASSWORD16");
+        String telno  = (String) stringObjectMap.get("TELNO");
+        String company  = (String) stringObjectMap.get("COMPANY");
+        String partno  = (String) stringObjectMap.get("PARTNO");
+        String nextname  = (String) stringObjectMap.get("NEXTNAME");
+        userDTO.setPeson(peson);
+        userDTO.setDbfPath(dbfPath);
+        userDTO.setCname(CNAME);
+        userDTO.setLogin(true);
+        userDTO.setPartno(partno);
+        userDTO.setCompany(company);
+        userDTO.setTelno(telno);
+        userDTO.setNextname(nextname);
+        List<Object> partnos = Arrays.asList(partno);
+        List<Object> companys = Arrays.asList(company);
+        List<Map<String, Object>> mapsAp = DBFSqlUtils.executeQuerySqlListResult(dbfPath, "select * from Accpart where partno = ?", partnos);
+        if(!mapsAp.isEmpty()){
+            Map<String, Object> mapsAp0 = mapsAp.get(0);
+            String partname = (String) mapsAp0.get("PARTNAME");
+            userDTO.setPartname(partname);
+        }
+        List<Map<String, Object>> mapsCp = DBFSqlUtils.executeQuerySqlListResult(dbfPath, "select * from Compart where code = ?", companys);
+        if(!mapsCp.isEmpty()){
+            Map<String, Object> mapsCp0 = mapsCp.get(0);
+            String jname = (String) mapsCp0.get("JNAME");
+            userDTO.setJname(jname);
+        }
+        String token = TokenUtils.encrypt(userDTO.getPeson(),dbfPath);
+        userDTO.setToken(token);
+
+        loginUserMap.put(token,userDTO);
+
+        return userDTO;
     }
 }

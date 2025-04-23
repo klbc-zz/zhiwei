@@ -4,3 +4,5 @@ file:
   upload-dir: /app/upload/
   access-base-url: http://124.222.186.30:8099/files/
 
+restart:
+  path: \app\zhiwei\restart.sh
