@@ -25,11 +25,8 @@ public class GlobalExceptionHandler {
         try {
             String scriptPath = RESTART_PATH;  // 替换为你的脚本路径
             log.info("RESTART_PATH:{}", scriptPath);
-            Process process = Runtime.getRuntime().exec(new String[]{
-                     "cmd", "/c", "start", "/b",
-                            scriptPath
-                    });
-//            Runtime.getRuntime().exec("cmd /c start " + scriptPath);
+
+            Runtime.getRuntime().exec("cmd /c start " + scriptPath);
         } catch (IOException ex) {
             System.err.println("执行重启脚本失败: " + ex.getMessage());
             log.error("执行重启脚本失败: {}",ex.getMessage(), ex);

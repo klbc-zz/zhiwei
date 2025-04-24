@@ -2,6 +2,6 @@
 
 file:
   upload-dir: D:/app/zhiwei/upload/
-  access-base-url: http://localhost:8099/files/
+  access-base-url: http://localhost:8087/files/
 restart:
-  path: D:\\app\\zhiwei\\restart.bat
+  path: D:/app/zhiwei/restart.bat

@@ -1,19 +1,23 @@
 @echo off
-REM 重启脚本路径: C:\your-app\restart.bat
 
-REM 1. 杀死当前进程
-for /f "tokens=1,2 delims= " %%A in ('jps -l ^| find "zhiwei-0.0.1-SNAPSHOT.jar"') do (
-    echo Killing PID %%A...
-    taskkill /F /PID %%A
+set JAR_NAME=zhiwei-0.0.1-SNAPSHOT.jar
+set JAR_PATH=D:\app\zhiwei\%JAR_NAME%
+set LOG_PATH=D:\app\zhiwei\app.log
+set PORT=8087
+
+echo Stopping the application...
+
+for /f "tokens=1 delims= " %%i in (
+    'jps -l ^| find "%JAR_NAME%"'
+) do (
+    taskkill /F /PID %%i
 )
 
-REM 2. 等待3秒确保进程终止
-timeout /t 3 /nobreak >nul
+echo Wait for the process to be released...
+timeout /t 3 /nobreak > nul
 
-REM 3. 重新启动应用
-echo Restarting application...
+echo Restarting the application...
 
-start "" javaw -jar D:\app\zhiwei\zhiwei-0.0.1-SNAPSHOT.jar --server.port=8087 >> D:\app\zhiwei\app.log 2>&1
+start /b javaw -jar D:\app\zhiwei\zhiwei-0.0.1-SNAPSHOT.jar --server.port=8087 >> D:\app\zhiwei\app.log 2>&1
 
-echo Application restarted.
-exit
+echo The service was successfully restarted
