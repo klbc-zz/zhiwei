@@ -27,6 +27,7 @@ public class LoginUserService {
         UserDTO userDTO = new UserDTO();
         userDTO.setIp(loginUser.getIp());
         userDTO.setDbfPath(loginUser.getDbfPath());
+        userDTO.setIp(loginUser.getIp());
         String peson = loginUser.getPeson();
         String password1 = loginUser.getPassword1();
         if (peson == null) {
@@ -80,7 +81,7 @@ public class LoginUserService {
                 String jname = (String) mapsCp0.get("JNAME");
                 userDTO.setJname(jname);
             }
-            String token = TokenUtils.encrypt(userDTO.getPeson(),loginUser.getDbfPath());
+            String token = TokenUtils.encrypt(userDTO.getPeson(),loginUser.getDbfPath(),loginUser.getIp());
             loginUserMap.put(token,userDTO);
             userDTO.setToken(token);
             return userDTO;
@@ -97,14 +98,14 @@ public class LoginUserService {
         UserDTO userDTO =  loginUserMap.get(token);
         if(userDTO == null){
             String[] ut = TokenUtils.decrypt(token);
-            if(ut==null || ut.length != 2){
+            if(ut==null || ut.length != 3){
                 return null;
             }
-            userDTO = getUserByToken(ut[0],ut[1]);
+            userDTO = getUserByToken(ut[0],ut[1],ut[2]);
         }
         return userDTO;
     }
-    private UserDTO getUserByToken(String peson,String dbfPath) {
+    private UserDTO getUserByToken(String peson,String dbfPath,String ip) {
         ArrayList<Object> params = new ArrayList<>();
         params.add(peson);
         List<Map<String, Object>> maps = DBFSqlUtils.executeQuerySqlListResult2(dbfPath, "select * from Newview where peson = ?", params);
@@ -125,6 +126,7 @@ public class LoginUserService {
         String nextname  = (String) stringObjectMap.get("NEXTNAME");
         userDTO.setPeson(peson);
         userDTO.setDbfPath(dbfPath);
+        userDTO.setIp(ip);
         userDTO.setCname(CNAME);
         userDTO.setLogin(true);
         userDTO.setPartno(partno);
@@ -145,7 +147,7 @@ public class LoginUserService {
             String jname = (String) mapsCp0.get("JNAME");
             userDTO.setJname(jname);
         }
-        String token = TokenUtils.encrypt(userDTO.getPeson(),dbfPath);
+        String token = TokenUtils.encrypt(userDTO.getPeson(),dbfPath,ip);
         userDTO.setToken(token);
 
         loginUserMap.put(token,userDTO);

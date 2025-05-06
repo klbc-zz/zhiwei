@@ -17,7 +17,7 @@ public class TokenUtils {
      * @param dbfPath 路径
      * @return 加密后的token字符串
      */
-    public static String encrypt(String username, String dbfPath) {
+    public static String encrypt(String username, String dbfPath,String ip) {
         try {
             IvParameterSpec iv = new IvParameterSpec(INIT_VECTOR.getBytes(StandardCharsets.UTF_8));
             SecretKeySpec skeySpec = new SecretKeySpec(SECRET_KEY.getBytes(StandardCharsets.UTF_8), "AES");
@@ -26,7 +26,7 @@ public class TokenUtils {
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
 
             // 将用户名和路径用特殊字符连接起来
-            String originalText = username + "|||" + dbfPath;
+            String originalText = username + "|||" + dbfPath+"|||"+ip;
             byte[] encrypted = cipher.doFinal(originalText.getBytes());
 
             return Base64.getEncoder().encodeToString(encrypted);
@@ -53,7 +53,7 @@ public class TokenUtils {
             String originalText = new String(original);
 
             // 分割用户名和路径
-            return originalText.split("\\|\\|\\|", 2);
+            return originalText.split("\\|\\|\\|", 3);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -64,16 +64,18 @@ public class TokenUtils {
         // 测试示例
         String username = "OR";
         String dbfPath = "D:/work/parttime/zhiwei-master/src/main/resources/dbf/new2";
-        
+        String ip = "http://127.0.0.1";
+
         // 加密
-        String token = encrypt(username, dbfPath);
+        String token = encrypt(username, dbfPath,ip);
         System.out.println("加密后的Token: " + token);
         
         // 解密
         String[] result = decrypt(token);
-        if (result != null && result.length == 2) {
+        if (result != null && result.length == 3) {
             System.out.println("解密后的用户名: " + result[0]);
             System.out.println("解密后的路径: " + result[1]);
+            System.out.println("解密后的路径: " + result[2]);
         }
     }
 }

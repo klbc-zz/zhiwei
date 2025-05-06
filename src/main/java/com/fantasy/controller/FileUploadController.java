@@ -38,16 +38,20 @@ public class FileUploadController {
         try {
             UserDTO user = loginUserService.getLoginUser(token);
             String folder = "";
+            String basePath = "";
+            String baseIp = "";
             if (user != null) {
                 if (StringUtils.isEmpty(user.getDbfPath()) || StringUtils.isEmpty(user.getPeson())){
                     return ResponseEntity.badRequest().body("请先登录");
                 }
                 folder = user.getPeson();
+                basePath = user.getDbfPath();
+                baseIp = user.getIp();
             }else {
                 return ResponseEntity.badRequest().body("请先登录");
             }
 
-            String fileUrl = fileStorageService.storeFile(file,folder);
+            String fileUrl = fileStorageService.storeFile(file,basePath,baseIp,folder);
             return ResponseEntity.ok().body(new UploadResponse(true, "文件上传成功", fileUrl));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new UploadResponse(false, "文件上传失败: " + e.getMessage(), null));

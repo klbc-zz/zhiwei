@@ -16,4 +16,5 @@ public class UserDTO extends Connect {
     private String telno;
     private String nextname;
     private String token;
+    private String ip;
 }

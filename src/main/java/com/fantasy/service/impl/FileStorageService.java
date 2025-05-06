@@ -23,7 +23,7 @@ public class FileStorageService {
     @Value("${file.access-base-url}")
     private String accessBaseUrl;
 
-    public String storeFile(MultipartFile file, String folder) throws IOException {
+    public String storeFile(MultipartFile file,String basePath,String baseIp, String folder) throws IOException {
         // 验证文件类型
         if (!isFileTypeAllowed(file.getContentType())) {
             throw new IllegalArgumentException("不支持的文件类型");
@@ -48,7 +48,7 @@ public class FileStorageService {
         Files.copy(file.getInputStream(), filePath);
 
         // 返回访问URL (包含文件夹路径)
-        return accessBaseUrl + safeFolder + "/" + uniqueFileName;
+        return baseIp + accessBaseUrl + safeFolder + "/" + uniqueFileName;
     }
 
     private boolean isFileTypeAllowed(String contentType) {

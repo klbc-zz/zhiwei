@@ -25,8 +25,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @EnableAsync // 开启异步编程
 public class WebConfig implements WebMvcConfigurer {
-    @Value("${file.upload-dir}")
-    private String uploadDir;
+//    @Value("${file.upload-dir}")
+    private final static String uploadDir= "/upload/";
 
     /**
      * 跨域请求
