@@ -19,17 +19,27 @@ public class GlobalExceptionHandler {
     }
     @Value("${restart.path}")
     private String RESTART_PATH;
+    @Value("${spring.profiles.active}")
+    private String ACTIVE_PROFILE;
 
     // 执行重启脚本
-    private void triggerRestart() {
+    private synchronized  void triggerRestart() {
         try {
             String scriptPath = RESTART_PATH;  // 替换为你的脚本路径
             log.info("RESTART_PATH:{}", scriptPath);
-
-            Runtime.getRuntime().exec("cmd /c start " + scriptPath);
+//            Runtime.getRuntime().exec("cmd /c start " + scriptPath);
+            if (ACTIVE_PROFILE.equals("windows")) {
+                // Windows 执行方式
+                Runtime.getRuntime().exec("cmd /c start " + scriptPath);
+            } else if (ACTIVE_PROFILE.equals("linux")) {
+                // Linux/Unix/macOS 执行方式
+                String[] cmd = { "bash", scriptPath };
+                Runtime.getRuntime().exec(cmd);
+            }
         } catch (IOException ex) {
             System.err.println("执行重启脚本失败: " + ex.getMessage());
             log.error("执行重启脚本失败: {}",ex.getMessage(), ex);
         }
+
     }
 }
