@@ -43,6 +43,9 @@ public class UserController {
         if (connect != null) {
             loginUser.setDbfPath((String) connect);
         }
+        if(loginUser.getIp()==null||loginUser.getIp().equals("")){
+            return Result.error("登录失败，ip为空");
+        }
         UserDTO login = loginUserService.login(loginUser);
         if (login.isLogin()) {
             session.setAttribute("loginUser",login);

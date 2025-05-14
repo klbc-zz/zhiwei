@@ -48,7 +48,11 @@ public class FileStorageService {
         Files.copy(file.getInputStream(), filePath);
 
         // 返回访问URL (包含文件夹路径)
-        return baseIp + accessBaseUrl + safeFolder + "/" + uniqueFileName;
+        String res =  baseIp + accessBaseUrl + safeFolder + "/" + uniqueFileName;
+        if(!res.contains("http://")){
+            res = "http://"+res;
+        }
+        return res;
     }
 
     private boolean isFileTypeAllowed(String contentType) {

@@ -4,4 +4,4 @@ file:
   upload-dir: /upload/
   access-base-url: /files/
 restart:
-  path: E:/app/zhiwei/restart.bat
+  path: D:/app/zhiwei/restart.bat

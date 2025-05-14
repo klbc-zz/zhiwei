@@ -8,6 +8,7 @@ import com.fantasy.service.impl.LoginUserService;
 import com.fantasy.util.StringUtils;
 import com.github.xiaoymin.knife4j.annotations.ApiSupport;
 import io.swagger.annotations.Api;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/files")
 @ApiSupport(author = "fantasy0521")
@@ -52,6 +54,7 @@ public class FileUploadController {
             }
 
             String fileUrl = fileStorageService.storeFile(file,basePath,baseIp,folder);
+            log.info("FileUploadController.uploadFile:{}",fileUrl);
             return ResponseEntity.ok().body(new UploadResponse(true, "文件上传成功", fileUrl));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new UploadResponse(false, "文件上传失败: " + e.getMessage(), null));
